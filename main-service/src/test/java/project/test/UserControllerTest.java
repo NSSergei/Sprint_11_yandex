@@ -68,9 +68,10 @@ public class UserControllerTest {
                   "email": "abc@mail.ru",
                   "login": "",
                   "name": "Sergei",
-                  "birthday": 24.12.97;  
+                  "birthday": "1997-12-24" 
                 }
                 """;
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/users"))
                 .header("Content-Type", "application/json")
@@ -92,7 +93,7 @@ public class UserControllerTest {
                   "email": "abc.com",
                   "login": "XcX",
                   "name": "Sergei",
-                  "birthday": 24.12.97;  
+                  "birthday": "1997-12-24"
                 }
                 """;
         HttpRequest request = HttpRequest.newBuilder()
@@ -116,7 +117,7 @@ public class UserControllerTest {
                   "email": "",
                   "login": "XcX",
                   "name": "Sergei",
-                  "birthday": 24.12.97;  
+                  "birthday": "1997-12-24" 
                 }
                 """;
         HttpRequest request = HttpRequest.newBuilder()
@@ -140,7 +141,7 @@ public class UserControllerTest {
                   "email": "",
                   "login": "XcX",
                   "name": "Sergei",
-                  "birthday": "2039-12-24";  
+                  "birthday": "2039-12-24"
                 }
                 """;
         HttpRequest request = HttpRequest.newBuilder()
@@ -258,5 +259,569 @@ public class UserControllerTest {
         HttpResponse<String> putResponse = client.send(putRequest, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(400, putResponse.statusCode());
+    }
+
+    //PUT /users/{id}/friends/{friendId} — добавление в друзья.
+    @Test
+    void addFriend() throws IOException, InterruptedException {
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest addFriendRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/2"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addFriendResponse.statusCode());
+
+    }
+
+    @Test
+    void addWrongIdFriend() throws  IOException, InterruptedException{
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest addFriendRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/1"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(400, addFriendResponse.statusCode());
+
+    }
+
+    @Test
+    void addWrongUserId() throws  IOException, InterruptedException{
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest addFriendRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/5/friends/2"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, addFriendResponse.statusCode());
+
+    }
+
+    //DELETE /users/{id}/friends/{friendId} — удаление из друзей.
+
+    @Test
+    void deleteFriend() throws IOException, InterruptedException {
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest addFriendRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/2"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addFriendResponse.statusCode());
+
+        HttpRequest deleteRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/2"))
+                .header("Content-Type", "application/json")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, deleteResponse.statusCode());
+    }
+
+    @Test
+    void deleteSameIdFriend() throws IOException, InterruptedException {
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest addFriendRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/2"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addFriendResponse.statusCode());
+
+        HttpRequest deleteRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/1"))
+                .header("Content-Type", "application/json")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(400, deleteResponse.statusCode());
+    }
+
+    @Test
+    void deleteWrongFriendId() throws IOException, InterruptedException {
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest addFriendRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/2"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addFriendResponse.statusCode());
+
+        HttpRequest deleteRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/3"))
+                .header("Content-Type", "application/json")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, deleteResponse.statusCode());
+    }
+    //GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.
+    @Test
+    void getFriends() throws IOException, InterruptedException{
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest getRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+        HttpResponse getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200,getResponse.statusCode());
+    }
+
+    @Test
+    void getFriendsWithWrongUser() throws IOException, InterruptedException{
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        HttpRequest getRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/11/friends"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+        HttpResponse getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404,getResponse.statusCode());
+    }
+
+    //GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем.
+
+    @Test
+    void getCommonFriend() throws IOException, InterruptedException{
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        String testName3 = """
+                {
+                  "email": "JKL@mail.ru",
+                  "login": "YTIO",
+                  "name": "Nick",
+                  "birthday": "2002-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_3 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName3))
+                .build();
+        HttpResponse<String> postResponse_3 = client.send(postRequest_3, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_3.statusCode());
+
+        HttpRequest add1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/3"))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> addOneResponse = client.send(add1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addOneResponse.statusCode());
+
+        HttpRequest add2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/2/friends/3"))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> addTwoResponse = client.send(add2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addTwoResponse.statusCode());
+
+        HttpRequest commonRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/common/2"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpResponse<String> getResponse = client.send(commonRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200,getResponse.statusCode());
+        assertTrue(getResponse.body().contains("Nick"));
+    }
+
+    @Test
+    void getCommonUsersId() throws IOException, InterruptedException{
+        client = HttpClient.newHttpClient();
+        String testName1 = """
+                {
+                  "email": "sabc@mail.ru",
+                  "login": "XcX",
+                  "name": "Sergei",
+                  "birthday": "1997-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName1))
+                .build();
+        HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_1.statusCode());
+
+        String testName2 = """
+                {
+                  "email": "xxx@mail.ru",
+                  "login": "ZZZ",
+                  "name": "Alex",
+                  "birthday": "1980-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName2))
+                .build();
+        HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_2.statusCode());
+
+        String testName3 = """
+                {
+                  "email": "JKL@mail.ru",
+                  "login": "YTIO",
+                  "name": "Nick",
+                  "birthday": "2002-12-24"
+                }
+                """;
+
+        HttpRequest postRequest_3 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(testName3))
+                .build();
+        HttpResponse<String> postResponse_3 = client.send(postRequest_3, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, postResponse_3.statusCode());
+
+        HttpRequest add1 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/3"))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> addOneResponse = client.send(add1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addOneResponse.statusCode());
+
+        HttpRequest add2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/2/friends/3"))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> addTwoResponse = client.send(add2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, addTwoResponse.statusCode());
+
+        HttpRequest commonRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/common/1"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpResponse<String> getResponse = client.send(commonRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(400,getResponse.statusCode());
     }
 }
