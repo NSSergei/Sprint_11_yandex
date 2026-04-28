@@ -1,9 +1,11 @@
 package project.test;
 
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import project.storage.user.InMemoryUserStorage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,14 +18,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerTest {
+
     @LocalServerPort
     private int port;
+
     HttpClient client;
+
+    @Autowired
+    private InMemoryUserStorage inMemoryUserStorage;
+
+    @BeforeEach
+    void setUp() {
+        client = HttpClient.newHttpClient();
+        inMemoryUserStorage.getUserMap().clear();
+        inMemoryUserStorage.getFriendsInfoMap().clear();
+    }
 
     @Test
     void getAllUsers() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/users"))
                 .GET()
@@ -31,14 +43,11 @@ public class UserControllerTest {
 
         HttpResponse<String> response =
                 client.send(request, HttpResponse.BodyHandlers.ofString());
-
         assertEquals(200, response.statusCode());
     }
 
     @Test
     void postUsers() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testName = """
                 {
                   "email": "abc@mail.ru",
@@ -61,8 +70,6 @@ public class UserControllerTest {
 
     @Test
     void PostWrongUsersLogin() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testName = """
                 {
                   "email": "abc@mail.ru",
@@ -79,15 +86,11 @@ public class UserControllerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println(response.body());
         assertEquals(400, response.statusCode());
     }
 
     @Test
     void PostWrongUsersEmailIsEmpty() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testName = """
                 {
                   "email": "abc.com",
@@ -103,15 +106,11 @@ public class UserControllerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println(response.body());
         assertEquals(400, response.statusCode());
     }
 
     @Test
     void PostWrongUsersEmail() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testName = """
                 {
                   "email": "",
@@ -127,15 +126,11 @@ public class UserControllerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println(response.body());
         assertEquals(400, response.statusCode());
     }
 
     @Test
     void PostWrongUsersBirthday() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testName = """
                 {
                   "email": "",
@@ -151,15 +146,11 @@ public class UserControllerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println(response.body());
         assertEquals(400, response.statusCode());
     }
 
     @Test
     void PostCorrectUsersEmail() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testName = """
                 {
                   "email": "sabc@mail.ru",
@@ -176,14 +167,11 @@ public class UserControllerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        //System.out.println(response.body());
         assertEquals(200, response.statusCode());
     }
 
     @Test
-    void PutCorrectTest() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
-
+    void PutCorrectTest() throws IOException, InterruptedException {
         String testName = """
                 {
                   "email": "sabc@mail.ru",
@@ -198,6 +186,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName))
                 .build();
+
         HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
 
         String updateTestName = """
@@ -222,9 +211,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void PutWrongTest() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
-
+    void PutWrongTest() throws IOException, InterruptedException {
         String testName = """
                 {
                   "email": "sabc@mail.ru",
@@ -257,14 +244,12 @@ public class UserControllerTest {
                 .build();
 
         HttpResponse<String> putResponse = client.send(putRequest, HttpResponse.BodyHandlers.ofString());
-
         assertEquals(400, putResponse.statusCode());
     }
 
     //PUT /users/{id}/friends/{friendId} — добавление в друзья.
     @Test
     void addFriend() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -279,6 +264,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -304,14 +290,14 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build();
+
         HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, addFriendResponse.statusCode());
 
     }
 
     @Test
-    void addWrongIdFriend() throws  IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
+    void addWrongIdFriend() throws  IOException, InterruptedException {
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -326,6 +312,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -343,6 +330,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -351,14 +339,14 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build();
+
         HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(400, addFriendResponse.statusCode());
 
     }
 
     @Test
-    void addWrongUserId() throws  IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
+    void addWrongUserId() throws  IOException, InterruptedException {
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -373,6 +361,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -394,20 +383,17 @@ public class UserControllerTest {
         assertEquals(200, postResponse_2.statusCode());
 
         HttpRequest addFriendRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/users/5/friends/2"))
+                .uri(URI.create("http://localhost:" + port + "/users/1/friends/5"))
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build();
+
         HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, addFriendResponse.statusCode());
-
     }
-
-    //DELETE /users/{id}/friends/{friendId} — удаление из друзей.
 
     @Test
     void deleteFriend() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -462,7 +448,6 @@ public class UserControllerTest {
 
     @Test
     void deleteSameIdFriend() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -477,6 +462,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -494,6 +480,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -502,6 +489,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build();
+
         HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, addFriendResponse.statusCode());
 
@@ -517,7 +505,6 @@ public class UserControllerTest {
 
     @Test
     void deleteWrongFriendId() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -532,6 +519,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -549,6 +537,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -557,6 +546,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build();
+
         HttpResponse<String> addFriendResponse = client.send(addFriendRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, addFriendResponse.statusCode());
 
@@ -569,10 +559,9 @@ public class UserControllerTest {
         HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, deleteResponse.statusCode());
     }
-    //GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.
+
     @Test
-    void getFriends() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
+    void getFriends() throws IOException, InterruptedException {
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -587,6 +576,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -604,6 +594,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -612,13 +603,13 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
+
         HttpResponse getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(200,getResponse.statusCode());
     }
 
     @Test
-    void getFriendsWithWrongUser() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
+    void getFriendsWithWrongUser() throws IOException, InterruptedException {
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -633,6 +624,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -650,6 +642,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -658,15 +651,13 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
+
         HttpResponse getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
         assertEquals(404,getResponse.statusCode());
     }
 
-    //GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем.
-
     @Test
-    void getCommonFriend() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
+    void getCommonFriend() throws IOException, InterruptedException {
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -681,6 +672,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -698,6 +690,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -715,6 +708,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName3))
                 .build();
+
         HttpResponse<String> postResponse_3 = client.send(postRequest_3, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_3.statusCode());
 
@@ -746,8 +740,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getCommonUsersId() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
+    void getCommonUsersId() throws IOException, InterruptedException {
         String testName1 = """
                 {
                   "email": "sabc@mail.ru",
@@ -762,6 +755,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName1))
                 .build();
+
         HttpResponse<String> postResponse_1 = client.send(postRequest_1, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_1.statusCode());
 
@@ -779,6 +773,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName2))
                 .build();
+
         HttpResponse<String> postResponse_2 = client.send(postRequest_2, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_2.statusCode());
 
@@ -796,6 +791,7 @@ public class UserControllerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(testName3))
                 .build();
+
         HttpResponse<String> postResponse_3 = client.send(postRequest_3, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, postResponse_3.statusCode());
 

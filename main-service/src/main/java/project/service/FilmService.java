@@ -119,7 +119,6 @@ public class FilmService {
 
         log.info("Add users like: id {}, for film id {}", userId, filmId);
         inMemoryFilmStorage.getFilmsLikeInfoMap().get(filmId).add(userId);
-
     }
 
     public void deleteLike(long filmId, long userId) {

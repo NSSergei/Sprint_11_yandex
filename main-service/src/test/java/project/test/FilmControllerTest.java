@@ -1,34 +1,47 @@
 package project.test;
 
-
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import project.model.Film;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
+import project.storage.film.InMemoryFilmStorage;
+import project.storage.user.InMemoryUserStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FilmControllerTest {
+
     @LocalServerPort
     private int port;
+
     HttpClient client;
+
+    @Autowired
+    private InMemoryFilmStorage inMemoryFilmStorage;
+
+    @Autowired
+    private InMemoryUserStorage inMemoryUserStorage;
+
+    @BeforeEach
+    void setUp() {
+        client = HttpClient.newHttpClient();
+        inMemoryFilmStorage.getFilmMap().clear();
+        inMemoryFilmStorage.getFilmsLikeInfoMap().clear();
+        inMemoryUserStorage.getUserMap().clear();
+    }
 
     @Test
     void getAllFilms() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/films"))
                 .GET()
@@ -42,8 +55,6 @@ public class FilmControllerTest {
 
     @Test
     void PostFilm() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -65,8 +76,6 @@ public class FilmControllerTest {
 
     @Test
     void PostWrongFilmsName() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "",
@@ -83,14 +92,12 @@ public class FilmControllerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(response.body());
+
         assertEquals(400, response.statusCode());
     }
 
     @Test
     void PostWrongLengthDescription() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -114,8 +121,6 @@ public class FilmControllerTest {
 
     @Test
     void PostWrongDate() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -136,8 +141,6 @@ public class FilmControllerTest {
 
     @Test
     void PostCorrectDate() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -157,8 +160,6 @@ public class FilmControllerTest {
 
     @Test
     void PostWrontDuration() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -178,8 +179,6 @@ public class FilmControllerTest {
 
     @Test
     void PostCorrectDuration() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -198,9 +197,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void PutCorrectTest() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
-
+    void PutCorrectTest() throws IOException, InterruptedException {
         String postFilm = """
                 {
                  "name": "Matrix",
@@ -235,13 +232,10 @@ public class FilmControllerTest {
 
         assertEquals(200, putResponse.statusCode());
         assertTrue(putResponse.body().contains("Matrix 2"));
-
     }
 
     @Test
-    void PutWrongTest() throws IOException, InterruptedException{
-        client = HttpClient.newHttpClient();
-
+    void PutWrongTest() throws IOException, InterruptedException {
         String postFilm = """
                 {
                  "name": "Matrix",
@@ -288,7 +282,6 @@ public class FilmControllerTest {
                 }
                 """;
 
-        client = HttpClient.newHttpClient();
         HttpRequest putRequest = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/films"))
                 .header("Content-Type", "application/json")
@@ -327,7 +320,6 @@ public class FilmControllerTest {
                 }
                 """;
 
-        client = HttpClient.newHttpClient();
         HttpRequest putRequest = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/films"))
                 .header("Content-Type", "application/json")
@@ -348,8 +340,6 @@ public class FilmControllerTest {
 
     @Test
     void testAddLikeToFilm() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -397,8 +387,6 @@ public class FilmControllerTest {
 
     @Test
     void  testAddLikeToFilmWrongUser() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -447,8 +435,6 @@ public class FilmControllerTest {
 
     @Test
     void  testAddLikeToInvalidFilmId() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -492,13 +478,10 @@ public class FilmControllerTest {
 
         HttpResponse<String> likeResponse = client.send(requestToTestLike, HttpResponse.BodyHandlers.ofString());
         assertEquals(404,likeResponse.statusCode());
-
     }
 
     @Test
     void deleteLike() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -555,8 +538,6 @@ public class FilmControllerTest {
 
     @Test
     void testDeleteLikeToFilmWrongUser() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -613,8 +594,6 @@ public class FilmControllerTest {
 
     @Test
     void testDeleteLikeToInvalidFilmId() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -671,8 +650,6 @@ public class FilmControllerTest {
 
     @Test
     void  getTopFilmsList() throws IOException, InterruptedException {
-        client = HttpClient.newHttpClient();
-
         String testFilm = """
                 {
                   "name": "Matrix",
@@ -719,11 +696,13 @@ public class FilmControllerTest {
 
         HttpRequest requestToTop = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/films/popular?count=10"))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.noBody())
+                .GET()
                 .build();
-        HttpResponse responseToTop = client.send(requestToTop, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200,likeResponse.statusCode());
+
+        HttpResponse<String> responseToTop =
+                client.send(requestToTop, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, responseToTop.statusCode());
     }
 
 }
