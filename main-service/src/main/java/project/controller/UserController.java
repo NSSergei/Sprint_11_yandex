@@ -3,13 +3,11 @@ package project.controller;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
-
 import project.model.User;
 import org.springframework.web.bind.annotation.*;
 import project.service.UserService;
 
 import java.util.Collection;
-
 
 @Slf4j
 @RestController
@@ -22,35 +20,35 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUsers(@Valid @RequestBody User user){
+    public User addUsers(@Valid @RequestBody User user) {
         log.info("Incoming user: {}", user);
-        return  userService.addUser(user);
+        return userService.addUser(user);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable  long id) {
+    public void deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
     }
 
     @PutMapping
-    public User changeUserInfo(@Valid @RequestBody User user){
+    public User changeUserInfo(@Valid @RequestBody User user) {
         return userService.changeUserInfo(user);
     }
 
     @GetMapping
-    public Collection<User> getAllUsers(){
+    public Collection<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id,
-                          @PathVariable long friendId) {
+                         @PathVariable long friendId) {
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable long id,
-                             @PathVariable long friendId) {
+                            @PathVariable long friendId) {
         userService.deleteFriend(id, friendId);
     }
 

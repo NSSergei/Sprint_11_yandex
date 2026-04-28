@@ -9,19 +9,18 @@ import project.service.FilmService;
 
 import java.util.Collection;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    FilmService filmService;
+    private final FilmService filmService;
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film){
+    public Film addFilm(@Valid @RequestBody Film film) {
         return filmService.addFilm(film);
     }
 
@@ -36,19 +35,19 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> getAllFilms(){
+    public Collection<Film> getAllFilms() {
         return filmService.getFilms();
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable long id,
-                           @PathVariable long userId) {
+                          @PathVariable long userId) {
         filmService.deleteLike(id, userId);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLikeToFilm(@PathVariable long id,
-                              @PathVariable long userId ) {
+                             @PathVariable long userId) {
         filmService.addLikeToFilm(id, userId);
     }
 

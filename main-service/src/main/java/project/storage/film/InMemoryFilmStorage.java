@@ -1,6 +1,5 @@
 package project.storage.film;
 
-
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +13,7 @@ import java.util.Set;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     @Getter
-    private final Map<Long,Film> filmMap = new HashMap<>();
+    private final Map<Long, Film> filmMap = new HashMap<>();
     @Getter
     Map<Long, Set<Long>> filmsLikeInfoMap = new HashMap<>();
 
@@ -42,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return filmMap.values();
     }
 
-    public long nextIndex(){
+    public long nextIndex() {
         long index = filmMap.keySet().stream()
                 .mapToLong(el -> el)
                 .max()

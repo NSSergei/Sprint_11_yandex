@@ -4,7 +4,11 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 import project.model.User;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -13,13 +17,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Getter
     private final Map<Long, Set<Long>> friendsInfoMap = new HashMap<>();
 
-    //CRUD
+    // CRUD
     @Override
     public User addUser(User user) {
         user.setId(nextIndex());
-        userMap.put(user.getId(),user);
+        userMap.put(user.getId(), user);
         friendsInfoMap.put(user.getId(), new HashSet<>());
-        return  user;
+        return user;
     }
 
     @Override
