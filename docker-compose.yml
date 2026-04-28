@@ -1,6 +1,12 @@
 services:
+  stats-server:
+    ports:
+      - "9090:9090"
+
+  stats-db:
+    image: postgres:16.1
+
   ewm-service:
-    build: ./main-service
     ports:
       - "8080:8080"
 
