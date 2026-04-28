@@ -39,7 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
         return userMap.values();
     }
 
-    public long nextIndex(){
+    public long nextIndex() {
         long index = userMap.keySet().stream()
                 .mapToLong(el -> el)
                 .max()

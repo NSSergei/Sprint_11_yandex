@@ -24,21 +24,21 @@ public class UserService {
 
     public User addUser(User user) {
         log.info("Request to create user");
-        if(user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             log.warn("Invalid login: {}", user.getLogin());
             throw new ValidationException("Логин не может быть пустым");
         }
 
-        if(user.getName() == null || user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
 
-        if(user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.warn("Invalid email: {}", user.getEmail());
             throw new ValidationException("Ошибка формата электронной почты / почта не должна быть пустой");
         }
 
-        if(user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Invalid birthday: {}", user.getBirthday());
             throw  new ValidationException("Дата рождения не может быть в будущем");
         }
@@ -50,38 +50,38 @@ public class UserService {
     }
 
     public void deleteUser(long id) {
-        if(!inMemoryUserStorage.getUserMap().containsKey(id)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(id)) {
             throw new NotFoundException("Пользователь с id " + id + " не найден");
         }
         inMemoryUserStorage.deleteUser(id);
     }
 
     public User changeUserInfo(User user) {
-        if(user.getId() == null){
+        if (user.getId() == null){
             log.warn("User id is missing: {}", user.getId());
             throw new ValidationException("Id отсутствие");
         }
 
-        if(!inMemoryUserStorage.getUserMap().containsKey(user.getId())){
+        if (!inMemoryUserStorage.getUserMap().containsKey(user.getId())) {
             log.warn("User with id {} not found", user.getId());
             throw new NotFoundException("Пользователь с id " + user.getId() + " не найден");
         }
 
-        if(user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")){
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             log.warn("Invalid login: {}", user.getLogin());
             throw new ValidationException("Логин не может быть пустым");
         }
 
-        if(user.getName() == null || user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
 
-        if(user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")){
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.warn("Invalid email: {}", user.getEmail());
             throw new ValidationException("Ошибка формата электронной почты / почта не должна быть пустой");
         }
 
-        if(user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())){
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Invalid birthday: {}", user.getBirthday());
             throw  new ValidationException("Дата рождения не может быть в будущем");
         }
@@ -96,25 +96,25 @@ public class UserService {
     }
 
     public void addFriend(long userId, long newFriendId) {
-        log.info("Request to add new Friend. User id {}, Friend id: {}", userId, newFriendId );
+        log.info("Request to add new Friend. User id {}, Friend id: {}", userId, newFriendId);
 
-        if(!inMemoryUserStorage.getUserMap().containsKey(userId)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(userId)) {
             log.warn("Invalid user id: {}", userId);
             throw new NotFoundException("Пользователь с userId " + userId + " не найден");
         }
 
-        if(!inMemoryUserStorage.getUserMap().containsKey(newFriendId)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(newFriendId)) {
             log.warn("Invalid friend id: {}", newFriendId);
             throw new NotFoundException("Пользователь с newFriendId " + newFriendId + " не найден");
         }
 
-        if(userId == newFriendId) {
+        if (userId == newFriendId) {
             log.warn("Пользователь не может добавить самого себя id пользователя{}, id друга{}",userId,
                     newFriendId);
             throw new ValidationException("Нельзя добавить самого себя в друзья");
         }
 
-        if(!inMemoryUserStorage.getFriendsInfoMap().containsKey(userId)) {
+        if (!inMemoryUserStorage.getFriendsInfoMap().containsKey(userId)) {
             log.info("Add new HashSet<>()");
             inMemoryUserStorage.getFriendsInfoMap().put(userId, new HashSet<>());
         }
@@ -130,17 +130,17 @@ public class UserService {
     public void deleteFriend(long userId, long newFriendId) {
         log.info("Request to delete Friend. User id {}, Friend id: {}", userId, newFriendId );
 
-        if(!inMemoryUserStorage.getUserMap().containsKey(userId)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(userId)) {
             log.warn("Invalid user id: {}", userId);
             throw new NotFoundException("Пользователь с userId " + userId + " не найден");
         }
 
-        if(!inMemoryUserStorage.getUserMap().containsKey(newFriendId)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(newFriendId)) {
             log.warn("Invalid friend id: {}", newFriendId);
             throw new NotFoundException("Пользователь с newFriendId " + newFriendId + " не найден");
         }
 
-        if(userId == newFriendId) {
+        if (userId == newFriendId) {
             log.warn("Нельзя удалить себя из своих друзей: id пользователя{}, id друга{}", userId, newFriendId);
             throw new ValidationException("Нельзя удалить самого себя из друзей");
         }
@@ -155,7 +155,7 @@ public class UserService {
     public Collection<User> getAllFriends(long id) {
         log.info("Start getALLFriends for user: id{}",id);
 
-        if(!inMemoryUserStorage.getUserMap().containsKey(id)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(id)) {
             log.warn("User not found in UserMap");
             throw new NotFoundException("id not found in userMap");
         }

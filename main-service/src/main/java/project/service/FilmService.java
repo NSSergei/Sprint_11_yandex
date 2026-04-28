@@ -34,7 +34,7 @@ public class FilmService {
             throw new ValidationException(" максимальная длина описания — 200 символов");
         }
 
-        if(film.getReleaseDate() != null && isBefore(film.getReleaseDate(), LocalDate.of(1895,12,28))) {
+        if (film.getReleaseDate() != null && isBefore(film.getReleaseDate(), LocalDate.of(1895,12,28))) {
             log.warn("Invalid ReleaseDate: {}", film.getReleaseDate());
             throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
         }
@@ -102,17 +102,17 @@ public class FilmService {
 
     public void addLikeToFilm(long filmId, long userId) {
         log.info("movies rating: userId{}, filmId{} ", userId, filmId);
-        if(!inMemoryUserStorage.getUserMap().containsKey(userId)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(userId)) {
             log.warn("Invalid userId{}, id not found in userMap", userId);
             throw new NotFoundException("Пользователь с данным id " + userId + " не найден");
         }
 
-        if(!inMemoryFilmStorage.getFilmMap().containsKey(filmId)) {
+        if (!inMemoryFilmStorage.getFilmMap().containsKey(filmId)) {
             log.warn("Invalid filmId{}, id not found in filmMap", filmId);
             throw new NotFoundException("Фильм с данным id " + filmId + " не найден");
         }
 
-        if(!inMemoryFilmStorage.getFilmsLikeInfoMap().containsKey(filmId)) {
+        if (!inMemoryFilmStorage.getFilmsLikeInfoMap().containsKey(filmId)) {
             log.info("Add new HashSet<>()");
             inMemoryFilmStorage.getFilmsLikeInfoMap().put(filmId, new HashSet<>());
         }
@@ -124,12 +124,12 @@ public class FilmService {
 
     public void deleteLike(long filmId, long userId) {
         log.info("delete like: userId{}, filmId{} ", userId, filmId);
-        if(!inMemoryUserStorage.getUserMap().containsKey(userId)) {
+        if (!inMemoryUserStorage.getUserMap().containsKey(userId)) {
             log.warn("Invalid userId{}, id not found in userMap", userId);
             throw new NotFoundException("Пользователь с данным id " + userId + " не найден");
         }
 
-        if(!inMemoryFilmStorage.getFilmMap().containsKey(filmId)) {
+        if (!inMemoryFilmStorage.getFilmMap().containsKey(filmId)) {
             log.warn("Invalid filmId{}, id not found in filmMap", filmId);
             throw new NotFoundException("Фильм с данным id " + filmId + " не найден");
         }
@@ -142,7 +142,7 @@ public class FilmService {
         log.info("Start method getTopFilmsList: requested top size = {}", count);
         ArrayList<Film> films = new ArrayList<>(inMemoryFilmStorage.getFilms());
 
-        if(films.size() < count) {
+        if (films.size() < count) {
             log.warn("Requested top {} films, but only {} films are available. Returning all available films.",
                     count, films.size());
             count = films.size();
