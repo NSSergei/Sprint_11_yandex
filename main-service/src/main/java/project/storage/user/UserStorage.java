@@ -5,11 +5,11 @@ import java.util.Collection;
 
 public interface UserStorage {
 
-    User addUser (User user);
+    User addUser(User user);
 
-    User updateUser (User user);
+    User updateUser(User user);
 
-    void deleteUser (long id);
+    void deleteUser(long id);
 
     Collection<User> getUsers();
 }

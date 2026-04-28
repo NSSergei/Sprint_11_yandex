@@ -18,6 +18,7 @@ import java.util.Set;
 @Service
 public class UserService {
     private final InMemoryUserStorage inMemoryUserStorage;
+
     public UserService(InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
@@ -57,7 +58,7 @@ public class UserService {
     }
 
     public User changeUserInfo(User user) {
-        if (user.getId() == null){
+        if (user.getId() == null) {
             log.warn("User id is missing: {}", user.getId());
             throw new ValidationException("Id отсутствие");
         }
@@ -86,7 +87,7 @@ public class UserService {
             throw  new ValidationException("Дата рождения не может быть в будущем");
         }
 
-        log.info("User updated: id={}, login={}", user.getId(), user.getLogin());
+        log.info("User updated: id= {}, login= {}", user.getId(), user.getLogin());
         return inMemoryUserStorage.updateUser(user);
     }
 
@@ -109,7 +110,7 @@ public class UserService {
         }
 
         if (userId == newFriendId) {
-            log.warn("Пользователь не может добавить самого себя id пользователя{}, id друга{}",userId,
+            log.warn("Пользователь не может добавить самого себя id пользователя{}, id друга{}", userId,
                     newFriendId);
             throw new ValidationException("Нельзя добавить самого себя в друзья");
         }
@@ -119,16 +120,16 @@ public class UserService {
             inMemoryUserStorage.getFriendsInfoMap().put(userId, new HashSet<>());
         }
 
-        log.info("Add new friend,for userId id{}, add newFriendId id{}", userId, newFriendId);
+        log.info("Add new friend,for userId id {}, add newFriendId id{}", userId, newFriendId);
         inMemoryUserStorage.getFriendsInfoMap().get(userId).add(newFriendId);
 
-        log.info("Add new friend,for newFriendId id{}, add userId id{}", newFriendId, userId);
+        log.info("Add new friend,for newFriendId id {}, add userId id{}", newFriendId, userId);
         inMemoryUserStorage.getFriendsInfoMap().get(newFriendId).add(userId);
 
     }
 
     public void deleteFriend(long userId, long newFriendId) {
-        log.info("Request to delete Friend. User id {}, Friend id: {}", userId, newFriendId );
+        log.info("Request to delete Friend. User id {}, Friend id: {}", userId, newFriendId);
 
         if (!inMemoryUserStorage.getUserMap().containsKey(userId)) {
             log.warn("Invalid user id: {}", userId);
@@ -153,7 +154,7 @@ public class UserService {
     }
 
     public Collection<User> getAllFriends(long id) {
-        log.info("Start getALLFriends for user: id{}",id);
+        log.info("Start getALLFriends for user: id{}", id);
 
         if (!inMemoryUserStorage.getUserMap().containsKey(id)) {
             log.warn("User not found in UserMap");
@@ -166,7 +167,7 @@ public class UserService {
         log.info("Start iteration.");
         for (Long friends : friendsId) {
             User friend = inMemoryUserStorage.getUserMap().get(friends);
-            if(friend != null) {
+            if (friend != null) {
                 allFriends.add(friend);
             }
         }
@@ -188,7 +189,7 @@ public class UserService {
             throw new ValidationException("Second id is not found in userMap");
         }
 
-        if(firstUser == secondUser) {
+        if (firstUser == secondUser) {
             log.warn("Пользователь 1 и пользователь 2 совпадают: firstUser{}, secondUser{}", firstUser, secondUser);
             throw new ValidationException("Пользователь 1 и 2 совпадают");
         }
@@ -199,7 +200,7 @@ public class UserService {
         ArrayList<User> mutualFriends = new ArrayList<>();
 
         for (Long friendId : friendsOfFirst) {
-            if(friendsOfSecond.contains(friendId)) {
+            if (friendsOfSecond.contains(friendId)) {
                 User user = inMemoryUserStorage.getUserMap().get(friendId);
                 mutualFriends.add(user);
             }
